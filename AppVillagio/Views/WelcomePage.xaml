@@ -1,0 +1,102 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppVillagio.ViewModels"
+             x:Class="AppVillagio.Views.WelcomePage"
+             BackgroundColor="#703F25"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*, Auto">
+        <ScrollView Grid.Row="0" VerticalOptions="Center">
+            <VerticalStackLayout Spacing="0" 
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Padding="0,40">
+                <Image Source="logo_michelin.png"
+                       WidthRequest="246"
+                       HeightRequest="106"
+                       Margin="0,0,0,30" 
+                       HorizontalOptions="Center" />
+
+                <Border StrokeShape="RoundRectangle 20"
+                        StrokeThickness="0"
+                        BackgroundColor="#A5755C"
+                        WidthRequest="280"
+                        HeightRequest="260">
+
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,8" Radius="8" Opacity="0.25"/>
+                    </Border.Shadow>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToLoginCommand}" 
+                                              CommandParameter="Familia"/>
+                    </Border.GestureRecognizers>
+
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="10">
+                        <Image Source="icon_familia.png" 
+                               WidthRequest="150"
+                               HeightRequest="120"
+                               HorizontalOptions="Center"
+                               Aspect="AspectFit"/>
+
+                        <Label Text="Famílias"
+                               TextColor="White"
+                               FontSize="32"
+                               FontAttributes="None"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="Ou"
+                       TextColor="White"
+                       FontSize="18"
+                       HorizontalOptions="Center"
+                       Margin="0,20,0,20"/>
+
+                <Border StrokeShape="RoundRectangle 20"
+                        StrokeThickness="0"
+                        BackgroundColor="#A5755C"
+                        WidthRequest="280"
+                        HeightRequest="260">
+
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,8" Radius="8" Opacity="0.25"/>
+                    </Border.Shadow>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToLoginCommand}" 
+                                              CommandParameter="Agencia"/>
+                    </Border.GestureRecognizers>
+
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="10">
+                        <Image Source="icon_agencia.png" 
+                               WidthRequest="93.75"
+                               HeightRequest="125"
+                               HorizontalOptions="Center"
+                               Aspect="AspectFit"/>
+
+                        <Label Text="Agências"
+                               TextColor="White"
+                               FontSize="32"
+                               FontAttributes="None"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1" 
+              BackgroundColor="#47150D"
+              HeightRequest="50" 
+              VerticalOptions="End">
+
+            <Image Source="icon_home_white.png"
+                   HeightRequest="42"
+                   WidthRequest="42"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>
