@@ -1,0 +1,120 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppVillagio.ViewModels"
+             x:Class="AppVillagio.Views.DashboardPage"
+             BackgroundColor="#703F25"
+             Shell.NavBarIsVisible="False"
+			 Shell.TabBarIsVisible="False">
+
+	<Grid RowDefinitions="Auto, *, Auto">
+
+		<Image Source="logo_michelin.png"
+               Grid.Row="0"
+               WidthRequest="246"
+               HeightRequest="106"
+               Margin="0,40,0,0"
+               HorizontalOptions="Center" />
+
+		<ScrollView Grid.Row="1" VerticalOptions="Center">
+			<VerticalStackLayout Spacing="20" 
+                                 Padding="0,20"
+                                 HorizontalOptions="Center">
+
+				<Border StrokeShape="RoundRectangle 20"
+                        StrokeThickness="0"
+                        BackgroundColor="#A5755C"
+                        WidthRequest="320"
+                        HeightRequest="230">
+
+					<Border.Shadow>
+						<Shadow Brush="Black" Offset="0,6" Radius="6" Opacity="0.25"/>
+					</Border.Shadow>
+
+					<Border.GestureRecognizers>
+						<TapGestureRecognizer Command="{Binding ReservarHorarioCommand}"/>
+					</Border.GestureRecognizers>
+
+					<VerticalStackLayout VerticalOptions="Center" Spacing="15">
+						<Label Text="Reserve seu horário aqui!"
+                               TextColor="White"
+                               FontSize="20"
+                               HorizontalOptions="Center"/>
+
+						<Image Source="icon_clock.png" 
+                               HeightRequest="100" 
+                               WidthRequest="100"
+                               HorizontalOptions="Center"/>
+					</VerticalStackLayout>
+				</Border>
+
+				<Label Text="Ou"
+                       TextColor="White"
+                       FontSize="18"
+                       HorizontalOptions="Center"/>
+
+				<Border StrokeShape="RoundRectangle 20"
+                        StrokeThickness="0"
+                        BackgroundColor="#A5755C"
+                        WidthRequest="320"
+                        HeightRequest="230">
+
+					<Border.Shadow>
+						<Shadow Brush="Black" Offset="0,6" Radius="6" Opacity="0.25"/>
+					</Border.Shadow>
+
+					<Border.GestureRecognizers>
+						<TapGestureRecognizer Command="{Binding VerReservasCommand}"/>
+					</Border.GestureRecognizers>
+
+					<VerticalStackLayout VerticalOptions="Center" Spacing="15">
+						<Label Text="Veja suas reservas aqui!"
+                               TextColor="White"
+                               FontSize="20"
+                               HorizontalOptions="Center"/>
+
+						<Image Source="icon_history.png" 
+                               HeightRequest="100" 
+                               WidthRequest="100"
+                               HorizontalOptions="Center"/>
+					</VerticalStackLayout>
+				</Border>
+
+			</VerticalStackLayout>
+		</ScrollView>
+
+		<Grid Grid.Row="2" 
+              BackgroundColor="#47150D"
+              HeightRequest="60"
+              ColumnDefinitions="*, *, *"
+              Padding="20,0">
+
+			<ImageButton Grid.Column="0"
+                         Source="icon_gear.png"
+                         Command="{Binding IrParaConfiguracoesCommand}"
+                         HeightRequest="32"
+                         WidthRequest="32"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"
+                         BackgroundColor="Transparent"/>
+
+			<ImageButton Grid.Column="1"
+                         Source="icon_home_white.png"
+                         Command="{Binding RecarregarHomeCommand}"
+                         HeightRequest="40"
+                         WidthRequest="40"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"
+                         BackgroundColor="Transparent"/>
+
+			<ImageButton Grid.Column="2"
+                         Source="icon_bag.png"
+                         Command="{Binding IrParaPedidosCommand}"
+                         HeightRequest="32"
+                         WidthRequest="32"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"
+                         BackgroundColor="Transparent"/>
+		</Grid>
+
+	</Grid>
+</ContentPage>

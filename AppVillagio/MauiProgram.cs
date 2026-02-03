@@ -1,42 +1,48 @@
 ﻿using Microsoft.Extensions.Logging;
 using CommunityToolkit.Maui;
-using AppVillagio.Services;
-using AppVillagio.ViewModels; // <--- Importante
-using AppVillagio.Views;      // <--- Importante
+using AppVillagio.Services;   // <--- Confira se tem esse using
+using AppVillagio.ViewModels; // <--- Confira se tem esse using
+using AppVillagio.Views;      // <--- Confira se tem esse using
 
 namespace AppVillagio;
 
 public static class MauiProgram
 {
-    public static MauiApp CreateMauiApp()
-    {
-        var builder = MauiApp.CreateBuilder();
-        builder
-            .UseMauiApp<App>()
-            .UseMauiCommunityToolkit()
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-            });
+	public static MauiApp CreateMauiApp()
+	{
+		var builder = MauiApp.CreateBuilder();
+		builder
+			.UseMauiApp<App>()
+			.UseMauiCommunityToolkit()
+			.ConfigureFonts(fonts =>
+			{
+				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+			});
 
-        // --- AQUI ESTAVA O PROBLEMA ---
+		
 
-        // 1. Serviços
-      
+		// 1. Serviço (Necessário para a ViewModel funcionar)
+		builder.Services.AddSingleton<ApiService>();
 
-        // 2. ViewModels (O erro aconteceu porque faltava essa linha aqui!)
-        builder.Services.AddTransient<WelcomeViewModel>();
-      
+		// 2. ViewModels
+		builder.Services.AddTransient<WelcomeViewModel>();
+		builder.Services.AddTransient<LoginViewModel>();
+		builder.Services.AddTransient<CadastroViewModel>();
+		builder.Services.AddTransient<DashboardViewModel>();
+		builder.Services.AddSingleton<UserSession>();
 
-        // 3. Pages
-        builder.Services.AddTransient<WelcomePage>();
-     
+
+		// 3. Pages
+		builder.Services.AddTransient<DashboardPage>();
+		builder.Services.AddTransient<WelcomePage>();
+		builder.Services.AddTransient<LoginPage>();
+		builder.Services.AddTransient<CadastroPage>();
 
 #if DEBUG
-        builder.Logging.AddDebug();
+		builder.Logging.AddDebug();
 #endif
 
-        return builder.Build();
-    }
+		return builder.Build();
+	}
 }
