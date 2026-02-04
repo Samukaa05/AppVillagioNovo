@@ -30,7 +30,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<LoginViewModel>();
 		builder.Services.AddTransient<CadastroViewModel>();
 		builder.Services.AddTransient<DashboardViewModel>();
-		builder.Services.AddSingleton<UserSession>();
+        builder.Services.AddTransient<ReservaPage>();
+        builder.Services.AddSingleton<UserSession>();
 
 
 		// 3. Pages
@@ -38,9 +39,10 @@ public static class MauiProgram
 		builder.Services.AddTransient<WelcomePage>();
 		builder.Services.AddTransient<LoginPage>();
 		builder.Services.AddTransient<CadastroPage>();
+        builder.Services.AddTransient<ReservaViewModel>();
 
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
 		return builder.Build();

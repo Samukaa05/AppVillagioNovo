@@ -1,145 +1,162 @@
 ﻿using System.Net.Http.Json;
-using AppVillagio.Services; // Para o UserSession
+using AppVillagio.Services;
+using AppVillagio.Models; // Importante para reconhecer a classe Atividade
 
 namespace AppVillagio.Services;
 
 public class ApiService
 {
-	private readonly HttpClient _httpClient;
-	private readonly UserSession _session; // Guardamos a sessão para usar o Token depois
+    private readonly HttpClient _httpClient;
+    private readonly UserSession _session;
 
-	// URL Base: Ajusta sozinho se for Android ou Windows
+    // CONFIGURAÇÃO DE URL (CRUCIAL PARA ANDROID)
+#if ANDROID
+    private const string BaseUrl = "http://10.0.2.2:5014"; // Android Emulator
+#else
+    private const string BaseUrl = "http://localhost:5014"; // Windows Machine
+#endif
 
-    private const string BaseUrl = "http://localhost:5014";
+    public ApiService(UserSession session)
+    {
+        _session = session;
+        _httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(BaseUrl)
+        };
+    }
 
+    // --- 1. LOGIN ---
+    public async Task<LoginResponseDto> LoginAsync(string identificador, string senha)
+    {
+        try
+        {
+            var loginData = new { Identificador = identificador, Senha = senha };
+            var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", loginData);
 
-	// Injetamos a Sessão aqui
-	public ApiService(UserSession session)
-	{
-		_session = session;
-		_httpClient = new HttpClient
-		{
-			BaseAddress = new Uri(BaseUrl)
-		};
-	}
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<LoginResponseDto>();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erro no Login: {ex.Message}");
+        }
+        return null;
+    }
 
-	// --- 1. LOGIN ---
-	public async Task<LoginResponseDto> LoginAsync(string identificador, string senha)
-	{
-		try
-		{
-			var loginData = new { Identificador = identificador, Senha = senha };
+    // --- 2. CADASTRAR USUÁRIO ---
+    public async Task<bool> CadastrarAsync(CadastroRequestDto dados)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/Auth/register", dados);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erro no Cadastro: {ex.Message}");
+            return false;
+        }
+    }
 
-			// Atenção: Confira se a rota no seu Backend é /api/Auth/login mesmo
-			var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", loginData);
+    // --- 3. BUSCAR ATIVIDADES (O QUE FALTAVA!) ---
+    public async Task<List<Atividade>> GetAtividadesAsync()
+    {
+        try
+        {
+            // Busca a lista de atividades do banco de dados via API
+            var response = await _httpClient.GetFromJsonAsync<List<Atividade>>("/api/Atividades");
+            return response ?? new List<Atividade>();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erro ao buscar atividades: {ex.Message}");
+            return new List<Atividade>(); // Retorna vazio para não travar a tela
+        }
+    }
 
-			if (response.IsSuccessStatusCode)
-			{
-				return await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-			}
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Erro na API: {ex.Message}");
-		}
+    // --- 4. CRIAR RESERVA ---
+    public async Task<bool> CriarReservaAsync(NovaReservaDto reserva)
+    {
+        try
+        {
+            AdicionarTokenNoHeader();
+            var response = await _httpClient.PostAsJsonAsync("/api/Reservas", reserva);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erro ao criar reserva: {ex.Message}");
+            return false;
+        }
+    }
 
-		return null;
-	}
+    // --- 5. BUSCAR RESERVAS DO CLIENTE ---
+    public async Task<List<ReservaDto>> GetMinhasReservasAsync(int clienteId)
+    {
+        try
+        {
+            AdicionarTokenNoHeader();
+            return await _httpClient.GetFromJsonAsync<List<ReservaDto>>($"/api/Reservas/cliente/{clienteId}");
+        }
+        catch
+        {
+            return new List<ReservaDto>();
+        }
+    }
 
-	// --- 2. CADASTRAR USUÁRIO (NOVO!) ---
-	public async Task<bool> CadastrarAsync(CadastroRequestDto dados)
-	{
-		try
-		{
-			// Envia os dados para a rota de registro
-			// Rota sugerida: /api/Auth/register
-			var response = await _httpClient.PostAsJsonAsync("/api/Auth/register", dados);
-
-			return response.IsSuccessStatusCode;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Erro no cadastro: {ex.Message}");
-			return false;
-		}
-	}
-
-	// --- 3. CRIAR RESERVA ---
-	public async Task<bool> CriarReservaAsync(NovaReservaDto reserva)
-	{
-		// DICA DE OURO: Adicionar o Token no Header antes de chamar
-		AdicionarTokenNoHeader();
-
-		var response = await _httpClient.PostAsJsonAsync("/api/Reservas", reserva);
-		return response.IsSuccessStatusCode;
-	}
-
-	// --- 4. BUSCAR RESERVAS DO CLIENTE ---
-	public async Task<List<ReservaDto>> GetMinhasReservasAsync(int clienteId)
-	{
-		try
-		{
-			AdicionarTokenNoHeader();
-			return await _httpClient.GetFromJsonAsync<List<ReservaDto>>($"/api/Reservas/cliente/{clienteId}");
-		}
-		catch
-		{
-			return new List<ReservaDto>();
-		}
-	}
-
-	// Método auxiliar para garantir que o Token vai junto na requisição
-	private void AdicionarTokenNoHeader()
-	{
-		if (!string.IsNullOrEmpty(_session.Token))
-		{
-			_httpClient.DefaultRequestHeaders.Authorization =
-				new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _session.Token);
-		}
-	}
+    // --- HELPER: Autenticação ---
+    private void AdicionarTokenNoHeader()
+    {
+        if (!string.IsNullOrEmpty(_session.Token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _session.Token);
+        }
+    }
 }
 
-// --- DTOs (Data Transfer Objects) ---
+// --- DTOs ---
 
 public class LoginResponseDto
 {
-	public int Id { get; set; }
-	public string Nome { get; set; }
-	public string Token { get; set; }
-	public string TipoUsuario { get; set; }
+    public int Id { get; set; }
+    public string Nome { get; set; }
+    public string Token { get; set; }
+    public string TipoUsuario { get; set; }
 }
 
-// ADICIONEI ESSE DTO PARA O CADASTRO FUNCIONAR:
 public class CadastroRequestDto
 {
-	public string Nome { get; set; }
-	public string Telefone { get; set; }
-	public string Senha { get; set; }
-	public string TipoUsuario { get; set; } // "Familia" ou "Agencia"
-	public string Email { get; set; }       // Opcional (só Agencia)
-	public string Cnpj { get; set; }        // Opcional (só Agencia)
+    public string Nome { get; set; }
+    public string Telefone { get; set; }
+    public string Senha { get; set; }
+    public string TipoUsuario { get; set; }
+    public string Email { get; set; }
+    public string Cnpj { get; set; }
 }
 
 public class NovaReservaDto
 {
-	public int ClienteId { get; set; }
-	public DateOnly DataReserva { get; set; }
-	public TimeOnly HoraInicio { get; set; }
-	public TimeOnly HoraFim { get; set; }
-	public string Observacoes { get; set; }
-	public List<ItemPedidoDto> Itens { get; set; } = new();
+    public int ClienteId { get; set; }
+    public DateOnly DataReserva { get; set; }
+    public TimeOnly HoraInicio { get; set; }
+    public TimeOnly HoraFim { get; set; }
+    public string Observacoes { get; set; }
+    public List<ItemPedidoDto> Itens { get; set; } = new();
 }
 
 public class ItemPedidoDto
 {
-	public int AtividadeId { get; set; }
-	public int Quantidade { get; set; }
+    public int AtividadeId { get; set; }
+    public int Quantidade { get; set; }
 }
 
 public class ReservaDto
 {
-	public int Id { get; set; }
-	public decimal ValorTotal { get; set; }
-	public string Status { get; set; }
-	public DateOnly DataReserva { get; set; }
+    public int Id { get; set; }
+    public decimal ValorTotal { get; set; }
+    public string Status { get; set; }
+    public DateOnly DataReserva { get; set; }
 }
