@@ -92,16 +92,32 @@ public class ApiService
         }
     }
 
-    // --- 5. BUSCAR RESERVAS DO CLIENTE ---
+    // --- 5. BUSCAR RESERVAS DO CLIENTE (CORRIGIDO) ---
     public async Task<List<ReservaDto>> GetMinhasReservasAsync(int clienteId)
     {
         try
         {
             AdicionarTokenNoHeader();
-            return await _httpClient.GetFromJsonAsync<List<ReservaDto>>($"/api/Reservas/cliente/{clienteId}");
+
+            // 1. Faz a chamada
+            var response = await _httpClient.GetAsync($"/api/Reservas/cliente/{clienteId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // 2. CONFIGURAÇÃO MÁGICA: Ignorar Maiúsculas/Minúsculas
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true // <--- ISSO RESOLVE O "LISTA VAZIA"
+                };
+
+                return await response.Content.ReadFromJsonAsync<List<ReservaDto>>(options);
+            }
+
+            return new List<ReservaDto>();
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Erro ao buscar reservas: {ex.Message}");
             return new List<ReservaDto>();
         }
     }
@@ -187,17 +203,3 @@ public class ItemPedidoDto
     public int Quantidade { get; set; }
 }
 
-public class ReservaDto
-{
-    public int Id { get; set; }
-
-    // A API não manda o nome do cliente na raiz, então pode vir nulo.
-    // Usaremos o nome da sessão na ViewModel para preencher.
-    public string NomeCliente { get; set; }
-
-    public DateTime DataReserva { get; set; } // Mudamos de DateOnly para DateTime
-    public TimeSpan HoraInicio { get; set; }  // Mudamos de TimeOnly para TimeSpan
-
-    // Ajuste na formatação para o novo tipo
-    public string DataFormatada => $"{DataReserva:dd/MM} {HoraInicio:hh\\:mm}";
-}

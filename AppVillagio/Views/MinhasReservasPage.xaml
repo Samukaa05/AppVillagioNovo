@@ -39,19 +39,14 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Grid ColumnDefinitions="*, *, Auto" Margin="0,10">
-                                <Label Text="{Binding NomeCliente}" TextColor="White" VerticalOptions="Center" FontSize="15"/>
 
-                                <Label Grid.Column="1" Text="{Binding DataFormatada}" TextColor="White" VerticalOptions="Center" FontSize="15"/>
+                                <Label Text="{Binding NomeCliente}" 
+               TextColor="White" VerticalOptions="Center" FontSize="15"/>
 
-                                <HorizontalStackLayout Grid.Column="2" Spacing="15">
-                                    <ImageButton Source="icon_edit.png" HeightRequest="24" WidthRequest="24"
-                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MinhasReservasViewModel}}, Path=EditarCommand}"
-                                                 CommandParameter="{Binding .}"/>
+                                <Label Grid.Column="1" 
+               Text="{Binding DataFormatada}" 
+               TextColor="#E0C09F" VerticalOptions="Center" FontSize="15"/>
 
-                                    <ImageButton Source="icon_trash.png" HeightRequest="24" WidthRequest="24"
-                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MinhasReservasViewModel}}, Path=ExcluirCommand}"
-                                                 CommandParameter="{Binding .}"/>
-                                </HorizontalStackLayout>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
