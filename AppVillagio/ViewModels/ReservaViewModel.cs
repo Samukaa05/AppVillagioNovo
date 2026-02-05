@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using AppVillagio.Services;
 using AppVillagio.Models;
+using AppVillagio.Views;
 
 namespace AppVillagio.ViewModels;
 
@@ -120,12 +121,55 @@ public partial class ReservaViewModel : ObservableObject
     [RelayCommand]
     private async Task Avancar()
     {
-        if (ValorTotalNumerico <= 0)
+        // 1. REGRA: Mínimo 1 Adulto
+        if (QtdAdultos < 1)
         {
-            await Shell.Current.DisplayAlert("Atenção", "Selecione pessoas e uma atividade primeiro.", "OK");
+            await Shell.Current.DisplayAlert("Regra", "É necessário pelo menos 1 adulto responsável.", "Entendi");
             return;
         }
-        await Shell.Current.DisplayAlert("Sucesso", $"Reserva de {TextoTotal} confirmada!", "OK");
-        // Aqui entraria a chamada pra API de criar reserva
+
+        // 2. Validação de Atividade
+        if (AtividadeSelecionada == null)
+        {
+            await Shell.Current.DisplayAlert("Atenção", "Selecione uma atividade!", "OK");
+            return;
+        }
+
+        // 3. REGRA: Capacidade Máxima
+        int totalPessoas = QtdAdultos + Qtd6a12Anos + QtdAte5Anos;
+        int limite = 0;
+        bool excedeu = false;
+
+        // Verifica o nome da atividade (pode usar ID se preferir)
+        if (AtividadeSelecionada.Nome.Contains("Café"))
+        {
+            limite = 120;
+            if (totalPessoas > 120) excedeu = true;
+        }
+        else if (AtividadeSelecionada.Nome.Contains("Passeio") || AtividadeSelecionada.Nome.Contains("Combo"))
+        {
+            limite = 50; // Passeio e Combo limitados a 50
+            if (totalPessoas > 50) excedeu = true;
+        }
+
+        if (excedeu)
+        {
+            await Shell.Current.DisplayAlert("Limite Excedido",
+                $"Para esta atividade, o grupo máximo é de {limite} pessoas.", "OK");
+            return;
+        }
+
+        // SE PASSOU POR TUDO: Vai para o Calendário levar esses dados
+        // Usamos um Dicionário para passar os dados para a próxima tela
+        var dadosNavegacao = new Dictionary<string, object>
+        {
+            { "QtdAdultos", QtdAdultos },
+            { "QtdCriancas", Qtd6a12Anos },
+            { "QtdBebes", QtdAte5Anos },
+            { "Atividade", AtividadeSelecionada },
+            { "ValorTotal", ValorTotalNumerico }
+        };
+
+        await Shell.Current.GoToAsync(nameof(CalendarioPage), dadosNavegacao);
     }
 }

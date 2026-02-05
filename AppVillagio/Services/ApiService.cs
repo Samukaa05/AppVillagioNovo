@@ -105,6 +105,40 @@ public class ApiService
             return new List<ReservaDto>();
         }
     }
+    // --- 6. DELETAR RESERVA ---
+    public async Task<bool> DeletarReservaAsync(int reservaId)
+    {
+        try
+        {
+            AdicionarTokenNoHeader(); // Garante que tá logado
+            var response = await _httpClient.DeleteAsync($"/api/Reservas/{reservaId}");
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    // --- 7. VERIFICAR HORÁRIOS OCUPADOS ---
+    public async Task<List<TimeSpan>> GetHorariosOcupadosAsync(DateTime data)
+    {
+        try
+        {
+            // Formata a data para yyyy-MM-dd para enviar na URL
+            string dataString = data.ToString("yyyy-MM-dd");
+            var response = await _httpClient.GetAsync($"/api/Reservas/ocupados/{dataString}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<TimeSpan>>();
+            }
+            return new List<TimeSpan>();
+        }
+        catch
+        {
+            return new List<TimeSpan>();
+        }
+    }
 
     // --- HELPER: Autenticação ---
     private void AdicionarTokenNoHeader()
@@ -156,7 +190,14 @@ public class ItemPedidoDto
 public class ReservaDto
 {
     public int Id { get; set; }
-    public decimal ValorTotal { get; set; }
-    public string Status { get; set; }
-    public DateOnly DataReserva { get; set; }
+
+    // A API não manda o nome do cliente na raiz, então pode vir nulo.
+    // Usaremos o nome da sessão na ViewModel para preencher.
+    public string NomeCliente { get; set; }
+
+    public DateTime DataReserva { get; set; } // Mudamos de DateOnly para DateTime
+    public TimeSpan HoraInicio { get; set; }  // Mudamos de TimeOnly para TimeSpan
+
+    // Ajuste na formatação para o novo tipo
+    public string DataFormatada => $"{DataReserva:dd/MM} {HoraInicio:hh\\:mm}";
 }

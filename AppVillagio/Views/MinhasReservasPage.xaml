@@ -1,0 +1,75 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppVillagio.ViewModels"
+             x:Class="AppVillagio.Views.MinhasReservasPage"  
+             BackgroundColor="#47150D"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto, *, Auto, Auto">
+
+        <Image Grid.Row="0" Source="logo_michelin.png" 
+               HeightRequest="80" Margin="0,30,0,20" HorizontalOptions="Center"/>
+
+        <Border Grid.Row="1"
+                StrokeShape="RoundRectangle 20"
+                BackgroundColor="#A5755C"
+                StrokeThickness="0"
+                Margin="20,0,20,20"
+                Padding="15">
+
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,5" Radius="5" Opacity="0.3"/>
+            </Border.Shadow>
+
+            <Grid RowDefinitions="Auto, Auto, *">
+
+                <Label Text="Seus Agendamentos" TextColor="White" FontSize="18" 
+                       HorizontalOptions="Center" Margin="0,0,0,15"/>
+
+                <Grid Grid.Row="1" ColumnDefinitions="*, *, Auto" Margin="0,0,0,10">
+                    <Label Text="Nome" TextColor="White" FontSize="16"/>
+                    <Label Grid.Column="1" Text="Data e hora" TextColor="White" FontSize="16"/>
+                </Grid>
+
+                <CollectionView Grid.Row="2" ItemsSource="{Binding Reservas}">
+                    <CollectionView.EmptyView>
+                        <Label Text="Nenhum agendamento encontrado." TextColor="#E0C09F" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*, *, Auto" Margin="0,10">
+                                <Label Text="{Binding NomeCliente}" TextColor="White" VerticalOptions="Center" FontSize="15"/>
+
+                                <Label Grid.Column="1" Text="{Binding DataFormatada}" TextColor="White" VerticalOptions="Center" FontSize="15"/>
+
+                                <HorizontalStackLayout Grid.Column="2" Spacing="15">
+                                    <ImageButton Source="icon_edit.png" HeightRequest="24" WidthRequest="24"
+                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MinhasReservasViewModel}}, Path=EditarCommand}"
+                                                 CommandParameter="{Binding .}"/>
+
+                                    <ImageButton Source="icon_trash.png" HeightRequest="24" WidthRequest="24"
+                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MinhasReservasViewModel}}, Path=ExcluirCommand}"
+                                                 CommandParameter="{Binding .}"/>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+        <Button Grid.Row="2" Text="Voltar" 
+                Command="{Binding VoltarCommand}"
+                BackgroundColor="#A5755C" TextColor="#E0C09F" 
+                CornerRadius="20" HeightRequest="50" WidthRequest="150"
+                Margin="0,0,0,20"/>
+
+        <Grid Grid.Row="3" BackgroundColor="#3E1209" HeightRequest="60" ColumnDefinitions="*, *, *">
+            <ImageButton Grid.Column="0" Source="icon_gear.png" HeightRequest="28"/>
+            <ImageButton Grid.Column="1" Source="icon_home_white.png" HeightRequest="35"/>
+            <ImageButton Grid.Column="2" Source="icon_bag.png" HeightRequest="28"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>

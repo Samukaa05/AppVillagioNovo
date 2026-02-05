@@ -1,0 +1,130 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppVillagio.ViewModels"
+             x:Class="AppVillagio.Views.CalendarioPage"
+             BackgroundColor="#703F25"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto, *, Auto, Auto">
+
+        <Image Grid.Row="0" Source="logo_michelin.png" HeightRequest="80" Margin="0,30,0,10" HorizontalOptions="Center"/>
+
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never">
+            <Border StrokeShape="RoundRectangle 30"
+            BackgroundColor="#A5755C"
+            StrokeThickness="0"
+            HorizontalOptions="Fill" 
+            Margin="20,0,20,20"
+            Padding="10"
+            VerticalOptions="Start">
+
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,6" Radius="6" Opacity="0.3"/>
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="10">
+
+                    <Label Text="Horários Disponíveis" TextColor="White" FontSize="18" HorizontalOptions="Center" Margin="0,0,0,5"/>
+
+                    <Grid ColumnDefinitions="Auto, *, Auto" HorizontalOptions="Fill" Margin="5,0">
+                        <ImageButton Command="{Binding MesAnteriorCommand}" Source="icon_arrow_left.png" HeightRequest="25" VerticalOptions="Center"/>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="-5">
+                            <Label Text="{Binding FrutaSafra}" TextColor="#E0C09F" FontSize="12" HorizontalOptions="Center"/>
+                            <Label Text="{Binding MesAnoTexto}" TextColor="White" FontSize="20" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+
+                        <ImageButton Grid.Column="2" Command="{Binding ProximoMesCommand}" Source="icon_arrow_right.png" HeightRequest="25" VerticalOptions="Center"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,5">
+                        <Label Text="D" TextColor="#E0C09F" HorizontalOptions="Center" FontSize="12"/>
+                        <Label Grid.Column="1" Text="S" TextColor="#E0C09F" HorizontalOptions="Center" FontSize="12"/>
+                        <Label Grid.Column="2" Text="T" TextColor="#E0C09F" HorizontalOptions="Center" FontSize="12"/>
+                        <Label Grid.Column="3" Text="Q" TextColor="#E0C09F" HorizontalOptions="Center" FontSize="12"/>
+                        <Label Grid.Column="4" Text="Q" TextColor="#E0C09F" HorizontalOptions="Center" FontSize="12"/>
+                        <Label Grid.Column="5" Text="S" TextColor="#E0C09F" HorizontalOptions="Center" FontSize="12"/>
+                        <Label Grid.Column="6" Text="S" TextColor="#E0C09F" HorizontalOptions="Center" FontSize="12"/>
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding Dias}" 
+                            HeightRequest="240" 
+                            SelectionMode="None"
+                            HorizontalOptions="Center">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="7" VerticalItemSpacing="6" HorizontalItemSpacing="4"/>
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border StrokeShape="RoundRectangle 16"
+                                HeightRequest="32" WidthRequest="32"
+                                BackgroundColor="{Binding CorFundo}"
+                                StrokeThickness="3">
+
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Stroke" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding IsSelecionado}" Value="True">
+                                                    <Setter Property="Stroke" Value="#2D9CDB"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CalendarioViewModel}}, Path=SelecionarDiaCommand}"
+                                                      CommandParameter="{Binding .}"/>
+                                    </Border.GestureRecognizers>
+
+                                    <Label Text="{Binding NumeroDia}" 
+                                   TextColor="White" FontSize="13" FontAttributes="Bold"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <BoxView HeightRequest="1" Color="#703F25" Opacity="0.3" Margin="0,5"/>
+
+                    <StackLayout BindableLayout.ItemsSource="{Binding HorariosDoDia}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,8">
+                                    <Label Text="{Binding Hora}" TextColor="#5A2E20" FontAttributes="Bold" VerticalOptions="Center" WidthRequest="60" FontSize="16"/>
+                                    <Label Grid.Column="1" Text="{Binding StatusTexto}" TextColor="White" VerticalOptions="Center"/>
+                                    <Button Grid.Column="2" 
+                                    Text="Agendar" 
+                                    IsVisible="{Binding IsDisponivel}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CalendarioViewModel}}, Path=AgendarHorarioCommand}"
+                                    CommandParameter="{Binding .}"
+                                    BackgroundColor="#8B5E45" 
+                                    TextColor="White" 
+                                    FontSize="12"
+                                    HeightRequest="35" 
+                                    CornerRadius="10"
+                                    Padding="15,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+        </ScrollView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="15" Padding="30,10">
+            <Button Grid.Column="0" Text="Voltar" BackgroundColor="#A5755C" TextColor="White" CornerRadius="20" HeightRequest="50"/>
+            <Button Grid.Column="1" Text="Seguinte" BackgroundColor="#A5755C" TextColor="White" FontAttributes="Bold" CornerRadius="20" HeightRequest="50"/>
+        </Grid>
+
+        <Grid Grid.Row="3" BackgroundColor="#47150D" HeightRequest="60" ColumnDefinitions="*, *, *">
+            <ImageButton Grid.Column="0" Source="icon_gear.png" HeightRequest="28" BackgroundColor="Transparent"/>
+            <ImageButton Grid.Column="1" Source="icon_home_white.png" HeightRequest="35" BackgroundColor="Transparent"/>
+            <ImageButton Grid.Column="2" Source="icon_bag.png" HeightRequest="28" BackgroundColor="Transparent"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>

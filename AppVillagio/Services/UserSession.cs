@@ -2,8 +2,9 @@
 
 public class UserSession
 {
-	// Aqui guardamos quem está logado
-	public string Nome { get; set; }
+    // Aqui guardamos quem está logado
+    public int Id { get; set; }
+    public string Nome { get; set; }
 	public string TipoUsuario { get; set; } // "Familia" ou "Agencia"
 	public string Identificador { get; set; } // Telefone ou CNPJ
 	public string Token { get; set; } // Futuro Token da API

@@ -26,8 +26,7 @@ public partial class DashboardViewModel : ObservableObject
     [RelayCommand]
     private async Task VerReservas()
     {
-        // Por enquanto um alerta, futuro: Navegar para HistóricoPage
-        await Shell.Current.DisplayAlert("Histórico", "Aqui você verá seus agendamentos antigos.", "OK");
+        await Shell.Current.GoToAsync(nameof(MinhasReservasPage));
     }
 
     // --- COMANDOS DO RODAPÉ (Footer) ---

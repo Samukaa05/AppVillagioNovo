@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:AppVillagio.ViewModels"
              x:Class="AppVillagio.Views.ReservaPage"
-             BackgroundColor="#47150D"
+             BackgroundColor="#703F25"
              Shell.NavBarIsVisible="False"
              Shell.TabBarIsVisible="False">
 

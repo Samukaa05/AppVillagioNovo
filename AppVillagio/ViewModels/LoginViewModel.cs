@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using AppVillagio.Services; // Importante para achar ApiService e UserSession
 using AppVillagio.Views;    // Importante para achar DashboardPage
+using AppVillagio.Models;
 
 namespace AppVillagio.ViewModels;
 
@@ -76,28 +77,32 @@ public partial class LoginViewModel : ObservableObject, IQueryAttributable
 	}
 
 	[RelayCommand]
-	private async Task Login()
-	{
-		// Feedback visual simples
-		// await Shell.Current.DisplayAlert("Aguarde", "Conectando...", "OK");
+    private async Task Login()
+    {
+        // Feedback visual simples
+        // await Shell.Current.DisplayAlert("Aguarde", "Conectando...", "OK");
 
-		// --- 3. AGORA O _apiService EXISTE E FUNCIONA ---
-		var resultadoLogin = await _apiService.LoginAsync(Identificador, Senha);
+        // Chama a API e guarda na variável 'resultadoLogin'
+        var resultadoLogin = await _apiService.LoginAsync(Identificador, Senha);
 
-		if (resultadoLogin != null)
-		{
-			// Salva os dados na memória do App
-			_session.Identificador = Identificador;
-			_session.Nome = resultadoLogin.Nome;
-			_session.Token = resultadoLogin.Token;
-			_session.TipoUsuario = _tipoUsuarioAtual; // Familia ou Agencia
+        if (resultadoLogin != null)
+        {
+            // Salva os dados na memória do App
+            _session.Identificador = Identificador;
+            _session.Nome = resultadoLogin.Nome;
 
-			// Vai para a Dashboard
-			await Shell.Current.GoToAsync($"//{nameof(DashboardPage)}");
-		}
-		else
-		{
-			await Shell.Current.DisplayAlert("Erro", "Login ou senha inválidos!", "OK");
-		}
-	}
+            // CORREÇÃO AQUI:
+            _session.Id = resultadoLogin.Id;
+
+            _session.Token = resultadoLogin.Token;
+            _session.TipoUsuario = _tipoUsuarioAtual;
+
+            // Vai para a Dashboard
+            await Shell.Current.GoToAsync($"//{nameof(DashboardPage)}");
+        }
+        else
+        {
+            await Shell.Current.DisplayAlert("Erro", "Login ou senha inválidos!", "OK");
+        }
+    }
 }
